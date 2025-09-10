@@ -1,0 +1,50 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def plot_shape(pts, name, col):
+    x, y = zip(*pts)
+    x += (x[0],)
+    y += (y[0],)
+    plt.plot(x, y, color=col, label=name)
+
+def move(pts, dx, dy):
+    M = np.array([[1, 0, dx],
+                  [0, 1, dy],
+                  [0, 0, 1]])
+    return transform(pts, M)
+
+def resize(pts, fx, fy):
+    S = np.array([[fx, 0, 0],
+                  [0, fy, 0],
+                  [0, 0, 1]])
+    return transform(pts, S)
+
+def turn(pts, ang):
+    r = np.radians(ang)
+    R = np.array([[np.cos(r), -np.sin(r), 0],
+                  [np.sin(r),  np.cos(r), 0],
+                  [0, 0, 1]])
+    return transform(pts, R)
+
+def transform(pts, mat):
+    new_pts = []
+    for x, y in pts:
+        vec = np.array([x, y, 1])
+        res = mat @ vec
+        new_pts.append((res[0], res[1]))
+    return new_pts
+
+tri = [(0, 0), (80, 0), (40, 70)]
+shifted = move(tri, 100, 60)
+enlarged = resize(tri, 1.3, 1.6)
+angled = turn(tri, 60)
+
+plt.figure(figsize=(8, 8))
+plot_shape(tri, "Base", 'blue')
+plot_shape(shifted, "Shifted", 'green')
+plot_shape(enlarged, "Resized", 'orange')
+plot_shape(angled, "Turned", 'red')
+plt.legend()
+plt.axis("equal")
+plt.grid(True)
+plt.show()
